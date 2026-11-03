@@ -1,0 +1,4 @@
+- insert:
+    - id: local-settings-sidebar
+      name: '@local/dsh-settings-sidebar'
+      config: {}
