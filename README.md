@@ -4,6 +4,18 @@
 
 Show or hide sidebar panel entries and add shortcuts to Settings sections. Existing panels use their actual sidebar names, not the shorter names of their corresponding Settings sections.
 
+## Screenshots
+
+### Manage visibility
+
+![Sidebar menu manager with individual visibility switches](https://raw.githubusercontent.com/zyileven/dsh-settings-sidebar/main/assets/menu-manager.png)
+
+### Settings shortcuts in the sidebar
+
+![Sidebar containing original panels and added Settings shortcuts](https://raw.githubusercontent.com/zyileven/dsh-settings-sidebar/main/assets/sidebar-shortcuts.png)
+
+Screenshots show two example configurations. Captured and provided by the plugin author for publication.
+
 ## Install
 
 Requires DeepSeek Harness Web or Desktop with the sidebar, Settings and layout client APIs. The plugin ships directly loadable JavaScript: no build, install scripts or additional runtime dependencies. React and the client store are supplied by the Harness module loader.

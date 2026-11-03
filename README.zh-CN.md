@@ -4,6 +4,18 @@
 
 控制 DeepSeek Harness 侧边栏功能菜单的显示，并为设置页面添加快捷入口。菜单名称采用侧边栏实际显示的名称，例如“大肥鱼军械库”，而不是对应设置项的简称。
 
+## 界面展示
+
+### 逐项管理菜单显隐
+
+![侧栏菜单管理页及各菜单显隐开关](https://raw.githubusercontent.com/zyileven/dsh-settings-sidebar/main/assets/menu-manager.png)
+
+### 设置快捷入口显示在侧栏
+
+![侧栏中的原有功能菜单与新增设置快捷入口](https://raw.githubusercontent.com/zyileven/dsh-settings-sidebar/main/assets/sidebar-shortcuts.png)
+
+两张截图展示不同的配置示例，由插件作者截取并提供用于公开介绍。
+
 ## 安装
 
 需要提供侧栏、设置和布局客户端接口的 DeepSeek Harness Web 或 Desktop。插件使用可直接加载的 JavaScript，无需构建、额外运行时依赖或安装脚本。React 和客户端 Store 由 Harness 的模块加载器提供。
