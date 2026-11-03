@@ -44,7 +44,7 @@ For a pinned version, use `github:zyileven/dsh-settings-sidebar#v1.1.1`. The pac
 2. Search for a menu and toggle its visibility. Existing panels, More and the manager itself are included.
 3. If you hide the manager, reopen **Settings → Sidebar menus** to restore it.
 
-Standalone pages open in the main area. Other shortcuts open the matching Settings section without replacing the page behind the dialog; closing it leaves that page selected. If the previous page's plugin has been removed, the shortcut falls back to the conversation. The Plugins inventory and built-in-plugin Settings section are separate entries.
+Where a menu opens depends on whether its content has a main page. Entries with their own main-content page open that page in the main content area, exactly as the original sidebar button does; entries that exist only as a Settings section have no main page, so they open the Settings dialog already positioned on that section. Such a dialog does not replace the page you were on: closing it leaves that page selected, and if that page's plugin has been removed the shortcut falls back to the conversation. The Plugins inventory page and the built-in-plugin Settings section are separate entries.
 
 Hiding an entry does not disable its plugin, delete its page or remove its Settings entry. New Session, workspace browsing and account/Settings controls are outside the panel-menu scope; Settings remains available for recovery.
 
