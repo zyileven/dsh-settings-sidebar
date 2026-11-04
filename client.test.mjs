@@ -102,15 +102,18 @@ test('all native entries, including Plugins and this manager, can be hidden and 
   for (const id of ['panel:mcp-manager', 'panel:plugins', 'panel:schedules', `panel:${ID}`, 'chrome:more']) app.toggle(id);
   assert(!app.style().includes('display:none!important'));
 });
-test('settings shortcuts register once, navigate, and disappear on removal; native pages stay native', () => {
+test('settings shortcuts register once, open their section, and disappear on removal; native pages stay native', () => {
   const app = boot();
   app.toggle('settings:general');
-  app.manager.open('settings:general');
+  assert.equal(app.slots.get('sidebar.panellist').filter(entry => entry.options.id === `${ID}:general`).length, 1);
+  app.navigate(`${ID}:general`);
   assert.equal(app.opened.at(-1), 'general');
   app.toggle('panel:xmanrui-dsh-im');
-  app.manager.open('panel:xmanrui-dsh-im');
-  assert.equal(app.selected.at(-1), 'xmanrui-dsh-im');
   assert.equal(app.slots.get('sidebar.panellist').filter(entry => entry.options.id === 'xmanrui-dsh-im').length, 1);
+  app.closeSettings();
+  app.navigate('xmanrui-dsh-im');
+  assert.equal(app.settingsOpen(), false);
+  assert.equal(app.selected.at(-1), 'xmanrui-dsh-im');
   app.toggle('settings:general');
   assert(!app.slots.get('sidebar.panellist').some(entry => entry.options.id === `${ID}:general`));
 });
@@ -164,13 +167,19 @@ test('modal shortcuts preserve the current main page through opening, closing, a
     }
   }
 });
-test('opening a modal shortcut from the manager does not redirect away from it', () => {
+test('each manager row offers only its visibility switch', () => {
   const app = boot();
-  app.navigate('plugins');
-  app.manager.open('settings:general');
-  assert.equal(app.currentPanel(), 'plugins');
-  app.closeSettings();
-  assert.equal(app.currentPanel(), 'plugins');
+  const entry = app.slots.get('main').find(item => item.options.key === ID);
+  const props = { ...entry.inject(), useMenus: selector => selector(app.state()) };
+  const buttons = [];
+  const walk = node => {
+    if (!node || typeof node !== 'object') return;
+    if (node.type === 'button') buttons.push(node);
+    for (const child of node.children || []) walk(child);
+  };
+  walk(entry.component(props));
+  assert.equal(buttons.length, app.state().rows.length);
+  assert(buttons.every(node => node.props.role === 'switch'));
 });
 test('a removed previous page returns to the conversation instead of an absent panel', () => {
   const app = boot();
