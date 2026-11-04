@@ -36,7 +36,7 @@ Alternatively, download `dsh-settings-sidebar.tgz` from [Releases](https://githu
 dsh plugin --profile desktop add ./dsh-settings-sidebar.tgz
 ```
 
-For a pinned version, use `github:zyileven/dsh-settings-sidebar#v1.2.0`. The package keeps its internal identifier `@local/dsh-settings-sidebar`; it is distributed through GitHub/tarballs, not npm.
+For a pinned version, use `github:zyileven/dsh-settings-sidebar#v1.3.0`. The package keeps its internal identifier `@local/dsh-settings-sidebar`; it is distributed through GitHub/tarballs, not npm.
 
 ## Use
 

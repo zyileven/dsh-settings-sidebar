@@ -36,7 +36,7 @@ dsh plugin --profile desktop add github:zyileven/dsh-settings-sidebar
 dsh plugin --profile desktop add ./dsh-settings-sidebar.tgz
 ```
 
-使用固定版本时将 GitHub spec 改为 `github:zyileven/dsh-settings-sidebar#v1.2.0`。本包保留内部标识 `@local/dsh-settings-sidebar`，仅从 GitHub/安装包分发，不发布到 npm。
+使用固定版本时将 GitHub spec 改为 `github:zyileven/dsh-settings-sidebar#v1.3.0`。本包保留内部标识 `@local/dsh-settings-sidebar`，仅从 GitHub/安装包分发，不发布到 npm。
 
 ## 使用
 
