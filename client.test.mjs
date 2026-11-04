@@ -8,7 +8,7 @@ const ID = 'local-settings-sidebar';
 const KEY = '@local/dsh-settings-sidebar/visibility-v2';
 function boot(storage = new Map()) {
   let definition, failWrite = false;
-  const listeners = new Map(), effects = [], queues = [];
+  const listeners = new Map(), effects = [], queues = [], dictionaries = new Map();
   const slots = new Map();
   const add = (name, options, component = () => null) => {
     const entry = { options, component };
@@ -48,7 +48,13 @@ function boot(storage = new Map()) {
   const ctx = {
     effect(fn) { const dispose = fn(); if (dispose) effects.push(dispose); },
     on(key, fn) { listeners.set(key, fn); },
-    locale: { register: () => () => {}, bind: ns => key => ns === 'sidebar' ? ({ 'panels.label': '全局面板', 'panels.more': '更多' })[key] : key === 'title' ? '侧栏菜单管理' : key },
+    locale: {
+      register(ns, language, dict) { dictionaries.set(`${ns}:${language}`, dict); return () => dictionaries.delete(`${ns}:${language}`); },
+      bind: ns => (key, params = {}) => {
+        const dict = ns === 'sidebar' ? { 'panels.label': '全局面板', 'panels.more': '更多' } : dictionaries.get(`${ns}:zh`);
+        return (dict?.[key] ?? key).replace(/\{(\w+)\}/g, (_, name) => params[name] ?? `{${name}}`);
+      },
+    },
     layout: { selectPanel: navigate, panelInfo: {
       getSnapshot: () => panel,
       subscribe(listener) { panelListeners.add(listener); return () => panelListeners.delete(listener); },
@@ -167,7 +173,7 @@ test('modal shortcuts preserve the current main page through opening, closing, a
     }
   }
 });
-test('each manager row offers only its visibility switch', () => {
+test('each destination has a localized jump button beside its independent visibility switch', () => {
   const app = boot();
   const entry = app.slots.get('main').find(item => item.options.key === ID);
   const props = { ...entry.inject(), useMenus: selector => selector(app.state()) };
@@ -178,8 +184,48 @@ test('each manager row offers only its visibility switch', () => {
     for (const child of node.children || []) walk(child);
   };
   walk(entry.component(props));
-  assert.equal(buttons.length, app.state().rows.length);
-  assert(buttons.every(node => node.props.role === 'switch'));
+  const switches = buttons.filter(node => node.props.role === 'switch');
+  const jumps = buttons.filter(node => node.props.role !== 'switch');
+  assert.equal(switches.length, app.state().rows.length);
+  assert.equal(jumps.length, app.state().rows.filter(row => !row.launcher).length);
+  assert(jumps.every(node => node.children[0] === '跳转'));
+  assert(!jumps.some(node => node.props['aria-label'] === '跳转至：更多'));
+  jumps.find(node => node.props['aria-label'] === '跳转至：通用设置').props.onClick();
+  assert.equal(app.opened.at(-1), 'general');
+});
+test('jump opens hidden destinations without pinning or persisting visibility changes', () => {
+  const app = boot();
+  app.toggle('panel:mcp-manager');
+  const before = JSON.stringify(app.state().visibility), storage = [...app.storage];
+  app.navigate(ID);
+  app.manager.jump('settings:general');
+  assert.equal(app.currentPanel(), ID);
+  assert.equal(app.opened.at(-1), 'general');
+  assert.equal(app.settingsOpen(), true);
+  app.manager.jump('panel:mcp-manager');
+  assert.equal(app.currentPanel(), 'mcp-manager');
+  assert.equal(app.settingsOpen(), false);
+  app.manager.jump('panel:xmanrui-dsh-im');
+  assert.equal(app.currentPanel(), 'xmanrui-dsh-im');
+  assert(!app.slots.get('sidebar.panellist').some(entry => entry.options.id === 'xmanrui-dsh-im'));
+  assert.equal(JSON.stringify(app.state().visibility), before);
+  assert.deepEqual([...app.storage], storage);
+});
+test('jump ignores launchers and reports unavailable destinations without changing selection', () => {
+  const app = boot();
+  app.navigate(ID);
+  app.manager.jump('chrome:more'); app.manager.jump('missing');
+  assert.equal(app.currentPanel(), ID);
+  app.slots.set('main', app.slots.get('main').filter(entry => entry.options.key !== 'schedules'));
+  app.manager.jump('panel:schedules');
+  assert.equal(app.currentPanel(), ID);
+  assert.equal(app.state().error, 'failed');
+  app.slots.set('settings.section', app.slots.get('settings.section').filter(entry => entry.options.id !== 'general'));
+  app.manager.jump('settings:general');
+  assert.equal(app.settingsOpen(), false);
+  assert.equal(app.state().error, 'failed');
+  app.manager.jump(`panel:${ID}`);
+  assert.equal(app.state().error, null);
 });
 test('a removed previous page returns to the conversation instead of an absent panel', () => {
   const app = boot();

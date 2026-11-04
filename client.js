@@ -18,8 +18,8 @@ window.__ModuleLoader__.load({
         native: '主页面', modal: '设置弹窗', launcher: '侧栏菜单入口',
         search: '搜索菜单', empty: '没有匹配的菜单',
         pinned: '显示 {count} 项', all: '侧栏菜单', toggle: '在侧栏显示：{name}',
-        retry: '重试', back: '返回菜单管理', opening: '正在打开对应设置…',
-        failed: '无法打开设置。请重新打开设置弹窗或重启应用后重试。',
+        jump: '跳转', jumpTo: '跳转至：{name}', retry: '重试', back: '返回菜单管理', opening: '正在打开对应设置…',
+        failed: '无法跳转至此菜单。请重新打开设置弹窗或重启应用后重试。',
         storageError: '无法保存菜单选择，请检查当前客户端的本地存储是否可用。',
         loadError: '已保存的菜单选择无法读取。重新勾选可保存新的选择。',
         foot: '仅控制功能菜单在主界面侧栏中的显示，不停用插件，也不移除设置中的入口。',
@@ -30,8 +30,8 @@ window.__ModuleLoader__.load({
         native: 'Main page', modal: 'Settings dialog', launcher: 'Sidebar menu launcher',
         search: 'Search menus', empty: 'No matching menus',
         pinned: '{count} visible', all: 'Sidebar menus', toggle: 'Show in sidebar: {name}',
-        retry: 'Retry', back: 'Back to menu management', opening: 'Opening the matching Settings section…',
-        failed: 'Could not open Settings. Reopen Settings or restart the application and try again.',
+        jump: 'Go to', jumpTo: 'Go to: {name}', retry: 'Retry', back: 'Back to menu management', opening: 'Opening the matching Settings section…',
+        failed: 'Could not go to this menu. Reopen Settings or restart the application and try again.',
         storageError: 'Could not save menu choices. Check that local storage is available in this client.',
         loadError: 'Saved choices could not be read. Select menus again to save new choices.',
         foot: 'Only sidebar panel visibility changes. Plugins remain enabled and Settings entries remain available.',
@@ -79,6 +79,7 @@ window.__ModuleLoader__.load({
             ...matches.map(row => h('div', { key: row.id, className: 'ssm-row' },
               h(MenuIcon, { size: 18 }),
               h('div', { className: 'ssm-name' }, row.label, h('span', { className: 'ssm-mode' }, props.t(row.launcher ? 'launcher' : row.target ? 'native' : 'modal'))),
+              !row.launcher && h('button', { type: 'button', className: 'ssm-button', 'aria-label': props.t('jumpTo', { name: row.label }), onClick: () => props.jump(row.id) }, props.t('jump')),
               h('button', { type: 'button', className: 'ssm-switch', role: 'switch', 'aria-label': props.t('toggle', { name: row.label }), 'aria-checked': row.visible, onClick: () => props.toggle(row.id) })))),
           h('p', { className: 'ssm-foot' }, props.t('foot'))));
     }
@@ -144,14 +145,34 @@ window.__ModuleLoader__.load({
           if (shortcut) openShortcut(shortcut.sectionId);
           else previousPanel = active;
         }
+        function settingsInstance() {
+          const handle = entries('sidebar.settings')[0]?.store;
+          if (!handle || typeof handle === 'function') return null;
+          const instance = handle.create();
+          return instance === handle.create() && typeof instance.actions.openSection === 'function' ? instance : null;
+        }
         function openSettings(id) {
           if (!entries('settings.section').some(entry => entry.options.id === id)) return false;
-          const handle = entries('sidebar.settings')[0]?.store;
-          if (!handle || typeof handle === 'function') return false;
-          const instance = handle.create();
-          if (instance !== handle.create() || typeof instance.actions.openSection !== 'function') return false;
+          const instance = settingsInstance();
+          if (!instance) return false;
           instance.actions.openSection(id);
           return true;
+        }
+        function jump(id) {
+          const row = menus.getSnapshot().rows.find(item => item.id === id);
+          if (!row || row.launcher) return;
+          if (row.target) {
+            if (!entries('main').some(entry => entry.options.key === row.target)) {
+              menus.update(d => { d.error = 'failed'; });
+              return;
+            }
+            settingsInstance()?.actions.close();
+            ctx.layout.selectPanel(row.target);
+            menus.update(d => { d.error = null; });
+          } else {
+            const opened = openSettings(row.sectionId);
+            menus.update(d => { d.error = opened ? null : 'failed'; });
+          }
         }
         function toggle(id) {
           const state = menus.getSnapshot(), row = state.rows.find(item => item.id === id);
@@ -166,7 +187,7 @@ window.__ModuleLoader__.load({
           menus.update(d => { d.visibility = next; d.error = null; });
           reconcile();
         }
-        const managerInject = () => ({ t, hooks: { menus }, toggle });
+        const managerInject = () => ({ t, hooks: { menus }, toggle, jump });
         function reconcile() {
           if (disposed || !ctx.slots.spec('main') || !ctx.slots.spec('sidebar.panellist')) return;
           const ownPanelIds = new Set([...registrations.values()].map(registration => registration.panelId));
