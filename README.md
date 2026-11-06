@@ -18,7 +18,7 @@ Screenshots show two example configurations. Captured and provided by the plugin
 
 ## Install
 
-Requires DeepSeek Harness Web or Desktop with the sidebar, Settings and layout client APIs. The plugin ships directly loadable JavaScript: no build, install scripts or additional runtime dependencies. React and the client store are supplied by the Harness module loader.
+Requires DeepSeek Harness Web or Desktop 0.2.2-rc.1 or newer (`engines.dsh: >=0.2.2-rc.1`) with the sidebar, Settings and layout client APIs. The Harness refuses to install the plugin where the running version does not satisfy that range. The plugin ships directly loadable JavaScript: no build, install scripts or additional runtime dependencies. React and the client store are supplied by the Harness module loader.
 
 Ask your Harness agent:
 
@@ -36,7 +36,7 @@ Alternatively, download `dsh-settings-sidebar.tgz` from [Releases](https://githu
 dsh plugin --profile desktop add ./dsh-settings-sidebar.tgz
 ```
 
-For a pinned version, use `github:zyileven/dsh-settings-sidebar#v1.3.0`. The package keeps its internal identifier `@local/dsh-settings-sidebar`; it is distributed through GitHub/tarballs, not npm.
+For a pinned version, use `github:zyileven/dsh-settings-sidebar#v1.4.0`. The package keeps its internal identifier `@local/dsh-settings-sidebar`; it is distributed through GitHub/tarballs, not npm.
 
 ## Use
 

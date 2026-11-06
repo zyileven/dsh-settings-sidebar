@@ -18,7 +18,7 @@
 
 ## 安装
 
-需要提供侧栏、设置和布局客户端接口的 DeepSeek Harness Web 或 Desktop。插件使用可直接加载的 JavaScript，无需构建、额外运行时依赖或安装脚本。React 和客户端 Store 由 Harness 的模块加载器提供。
+需要 DeepSeek Harness Web 或 Desktop 0.2.2-rc.1 或更新版本（`engines.dsh: >=0.2.2-rc.1`），并提供侧栏、设置和布局客户端接口。低于该版本时 Harness 会拒绝安装。插件使用可直接加载的 JavaScript，无需构建、额外运行时依赖或安装脚本。React 和客户端 Store 由 Harness 的模块加载器提供。
 
 在 Harness 对话中请求安装：
 
@@ -36,7 +36,7 @@ dsh plugin --profile desktop add github:zyileven/dsh-settings-sidebar
 dsh plugin --profile desktop add ./dsh-settings-sidebar.tgz
 ```
 
-使用固定版本时将 GitHub spec 改为 `github:zyileven/dsh-settings-sidebar#v1.3.0`。本包保留内部标识 `@local/dsh-settings-sidebar`，仅从 GitHub/安装包分发，不发布到 npm。
+使用固定版本时将 GitHub spec 改为 `github:zyileven/dsh-settings-sidebar#v1.4.0`。本包保留内部标识 `@local/dsh-settings-sidebar`，仅从 GitHub/安装包分发，不发布到 npm。
 
 ## 使用
 

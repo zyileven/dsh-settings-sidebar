@@ -236,3 +236,13 @@ test('a removed previous page returns to the conversation instead of an absent p
   assert.equal(app.currentPanel(), null);
   assert.equal(app.opened.at(-1), 'general');
 });
+
+test('the manifest declares the host version range the runtime enforces', () => {
+  const manifest = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
+  assert.equal(manifest.engines.dsh, '>=0.2.2-rc.1');
+  assert.equal(manifest.dsh.bundle.patch, './cordis.patch.yml');
+  assert.deepEqual(manifest.dsh.client.inject, [
+    '@deepseek-ai/dsh-client-ui-settings-general',
+    '@deepseek-ai/dsh-client-ui-sidebar',
+  ]);
+});
